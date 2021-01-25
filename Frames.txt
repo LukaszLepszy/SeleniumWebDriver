@@ -1,0 +1,64 @@
+import com.sun.xml.internal.ws.policy.AssertionSet;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class Frame {
+    ChromeDriver driver;
+
+    @BeforeEach
+    public void driverSetup() {
+        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
+//       System.setProperty("javax.net.ssl.trustStore","E:/IT/Java/Pliki/CERT.cer");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("incognito");
+//        options.addArguments("ignore-certificate-errors");
+        options.setAcceptInsecureCerts(true);
+        driver = new ChromeDriver(options);
+        driver.manage().window().setSize(new Dimension(1295, 760));
+        driver.manage().window().setPosition(new Point(8, 30));
+        driver.navigate().to("https://fakestore.testelka.pl/cwiczenia-z-ramek/");
+
+    }
+
+
+    @AfterEach
+    public void driverQuit() {
+        driver.close();
+        driver.quit();
+
+
+    }
+    @Test
+    public void buttondDisabledTest() {
+        driver.switchTo().frame("main-frame");
+       WebElement buttonMainPage = driver.findElement(By.cssSelector("input[type= 'button'][value='Strona g³ówna']"));
+        Assertions.assertFalse(buttonMainPage.isEnabled(), "Button is enabled");
+
+    }
+    @Test
+    public void imageLink() {
+        driver.switchTo().frame("main-frame");
+        driver.switchTo().frame("image");
+        WebElement imgWakacje = driver.findElement(By.xpath(".//img[@alt='Wakacje']/.."));
+        Assertions.assertEquals("https://fakestore.testelka.pl/",imgWakacje.getAttribute("href"), "There is not a suitable link");
+
+    }
+    @Test
+    public void lastButtonDisapledTest() {
+        driver.switchTo().frame("main-frame")
+                .switchTo().frame("image")
+                .switchTo().frame(0);
+       WebElement mainbutton = driver.findElement(By.cssSelector("a.button"));
+       Assertions.assertTrue(mainbutton.isEnabled(), "Button is not enabled");
+    }
+}
